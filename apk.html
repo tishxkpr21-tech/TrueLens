@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TruthLens+ GOD MODE</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI';
+    background: #020617;
+    color: white;
+    text-align: center;
+}
+
+.light {
+    background: white;
+    color: black;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.card {
+    width: 90%;
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+}
+
+textarea {
+    width: 95%;
+    height: 100px;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    background: #22c55e;
+    color: white;
+}
+
+.progress {
+    width: 90%;
+    height: 8px;
+    background: #334155;
+    margin: 10px auto;
+}
+
+.bar {
+    height: 8px;
+    width: 0%;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>🔍 TruthLens+ GOD MODE</h2>
+
+<div class="card">
+
+<textarea id="input"></textarea><br>
+
+<button onclick="scan()">Scan</button>
+<button onclick="simulateSMS()">SMS</button>
+<button onclick="startVoice()">🎤</button>
+<button onclick="toggleTheme()">🌙</button>
+<button onclick="downloadReport()">📄 Report</button>
+
+<div class="progress"><div id="bar" class="bar"></div></div>
+
+<div id="output"></div>
+
+</div>
+</div>
+
+<script>
+
+let lastResult = "";
+
+function toggleTheme() {
+    document.body.classList.toggle("light");
+}
+
+function startVoice() {
+    let r = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    r.onresult = e => input.value = e.results[0][0].transcript;
+    r.start();
+}
+
+function simulateSMS() {
+    let msgs = [
+        "URGENT bank alert click http://fake.xyz",
+        "Win ₹50000 now!!!",
+        "Your OTP is 123456"
+    ];
+    input.value = msgs[Math.floor(Math.random()*msgs.length)];
+    scan();
+}
+
+function scan() {
+
+    let text = input.value;
+    let t = text.toLowerCase();
+    let score = 0;
+    let reasons = [];
+
+    if(t.match(/http|\.xyz|bit\.ly/)) {score+=30; reasons.push("fake link");}
+    if(t.includes("urgent")) {score+=15; reasons.push("urgency");}
+    if(t.includes("otp")) {score+=15; reasons.push("otp risk");}
+    if(t.includes("win")||t.includes("prize")) {score+=20; reasons.push("lottery scam");}
+    if(t.includes("₹")||t.includes("money")) {score+=10; reasons.push("money trap");}
+
+    let label = score>70?"🚨 SCAM":score>30?"⚠️ Suspicious":"✅ Safe";
+
+    bar.style.width = score+"%";
+    bar.style.background = score>70?"red":score>30?"yellow":"green";
+
+    let explanation = "This message shows ";
+    explanation += reasons.join(", ") || "no major threats";
+
+    output.innerHTML = `
+    <h3>${label} (${score}%)</h3>
+    <p><b>AI Explanation:</b> ${explanation}</p>
+    `;
+
+    lastResult = output.innerText;
+}
+
+function downloadReport() {
+    let blob = new Blob([lastResult], {type:"text/plain"});
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "report.txt";
+    a.click();
+}
+
+</script>
+
+</body>
+</html>
